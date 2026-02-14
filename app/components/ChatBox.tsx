@@ -147,16 +147,14 @@ function ChatBox({ user }: any) {
                 </div>
               </div>
             ) : (
-              <div className="flex justify-end">
+              <div key={i} className="flex justify-start">
                 <div
                   className="max-w-xs md:max-w-md px-4 py-2 
-                bg-black dark:bg-gray-600 
-                text-white 
-                rounded-2xl rounded-br-none shadow-sm text-sm transition"
+                bg-white dark:bg-gray-800 
+                text-gray-800 dark:text-gray-100 
+                rounded-2xl rounded-bl-none shadow-sm text-sm transition"
                 >
-                  Outgoing message representing a message that I am sending to
-                  the other party. Should also be able to accomodate large
-                  paragraphs of text
+                  {msg.body}
                 </div>
               </div>
             );
