@@ -1,6 +1,58 @@
 "use client";
+import { createConsumer } from "@rails/actioncable";
+import { useEffect, useState } from "react";
 
-export default function ChatBox() {
+interface Message {
+  id: string;
+  body: string;
+  sender_id: string;
+  deleted_at: string | null;
+  sender_name: string;
+  created_at: string;
+}
+
+let subscription: any;
+function ChatBox({ user }: any) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("tk");
+    const CABLE_URL = `ws:localhost:3000/cable?token=${token}`;
+    const cable = createConsumer(CABLE_URL);
+
+    subscription = cable.subscriptions.create(
+      { channel: "ChatChannel" },
+      {
+        received(data: any) {
+          setMessages((prev) => {
+            console.log("Finders", data, user);
+            return [...prev, data];
+          });
+        },
+      },
+    );
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const sendMessage = () => {
+    if (!subscription) return;
+    subscription.send({
+      message: input,
+    });
+    setInput("");
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  };
+  //   useEffect(() => {
+  //     console.log(messages, user);
+  //   }, [setMessages]);
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar */}
@@ -53,17 +105,18 @@ export default function ChatBox() {
         {/* Messages Area */}
         <div
           className="flex-1 overflow-y-auto px-6 py-6 space-y-4 
-      bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
+            bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
         >
           {/* Incoming Message */}
           <div className="flex justify-start">
             <div
               className="max-w-xs md:max-w-md px-4 py-2 
-          bg-white dark:bg-gray-800 
-          text-gray-800 dark:text-gray-100 
-          rounded-2xl rounded-bl-none shadow-sm text-sm transition"
+                bg-white dark:bg-gray-800 
+                text-gray-800 dark:text-gray-100 
+                rounded-2xl rounded-bl-none shadow-sm text-sm transition"
             >
-              Incoming message that the other user in the pair sent. It should be able to accomodate large paragraphs of text
+              Incoming message that the other user in the pair sent. It should
+              be able to accomodate large paragraphs of text
             </div>
           </div>
 
@@ -71,13 +124,43 @@ export default function ChatBox() {
           <div className="flex justify-end">
             <div
               className="max-w-xs md:max-w-md px-4 py-2 
-          bg-black dark:bg-gray-600 
-          text-white 
-          rounded-2xl rounded-br-none shadow-sm text-sm transition"
+                bg-black dark:bg-gray-600 
+                text-white 
+                rounded-2xl rounded-br-none shadow-sm text-sm transition"
             >
-              Outgoing message representing a message that I am sending to the other party. Should also be able to accomodate large paragraphs of text
+              Outgoing message representing a message that I am sending to the
+              other party. Should also be able to accomodate large paragraphs of
+              text
             </div>
           </div>
+
+          {messages.map((msg, i) => {
+            return msg.sender_id == user.id ? (
+              <div key={i} className="flex justify-end">
+                <div
+                  className="max-w-xs md:max-w-md px-4 py-2 
+                bg-black dark:bg-gray-600 
+                text-white 
+                rounded-2xl rounded-br-none shadow-sm text-sm transition"
+                >
+                  {msg.body}
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <div
+                  className="max-w-xs md:max-w-md px-4 py-2 
+                bg-black dark:bg-gray-600 
+                text-white 
+                rounded-2xl rounded-br-none shadow-sm text-sm transition"
+                >
+                  Outgoing message representing a message that I am sending to
+                  the other party. Should also be able to accomodate large
+                  paragraphs of text
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Input Area */}
@@ -102,6 +185,9 @@ export default function ChatBox() {
             <input
               type="text"
               placeholder="Type a message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="flex-1 px-4 py-2 
             border border-gray-300 dark:border-gray-600 
             bg-white dark:bg-gray-700 
@@ -115,6 +201,7 @@ export default function ChatBox() {
 
             {/* Send Button */}
             <button
+              onClick={sendMessage}
               className="px-6 py-2 
           bg-black dark:bg-gray-600 
           text-white 
@@ -131,3 +218,5 @@ export default function ChatBox() {
     </div>
   );
 }
+
+export default ChatBox;

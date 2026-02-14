@@ -19,7 +19,6 @@ function Home() {
     }
 
     async function fetchUser() {
-      console.log("token: ", token)
       try {
         const response = await fetch(`${BASE_URL}/users/me`, {
           method: "GET",
@@ -53,7 +52,7 @@ function Home() {
   return (
     <div className="w-full">
       {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
-      <ChatBox />
+      <ChatBox user={user}/>
     </div>
   );
 }
