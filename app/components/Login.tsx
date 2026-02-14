@@ -25,7 +25,8 @@ function Login() {
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("tk", data.access_token);
+      localStorage.setItem("refr", data.refresh_token)
 
       console.log("Login successful:", data);
       return data;
