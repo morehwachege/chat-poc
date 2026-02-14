@@ -1,29 +1,58 @@
 "use client";
+
+import { BASE_URL } from "@/lib/baseUrl";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import GetUser from "./getUser";
 
 function Home() {
   const router = useRouter();
-  const [user, setUser] = useState<string | null>(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
-  const currentUser = user || GetUser;
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-    if (!storedUser) {
+  useEffect(() => {
+    const token = localStorage.getItem("tk");
+
+    if (!token) {
       router.replace("/");
-    } else {
-      setUser(storedUser);
+      return;
     }
 
-    setCheckingAuth(false);
+    async function fetchUser() {
+      console.log("token: ", token)
+      try {
+        const response = await fetch(`${BASE_URL}/users/me`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          router.replace("/");
+          return;
+        }
+
+        const data = await response.json();
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
+      } catch (error) {
+        router.replace("/");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
   }, [router]);
 
-  if (checkingAuth) return null;
+  if (loading) return null;
+
   return (
     <div>
       <p>This is something new</p>
+      <pre>{JSON.stringify(user, null, 2)}</pre>
     </div>
   );
 }
