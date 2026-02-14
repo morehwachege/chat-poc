@@ -51,7 +51,6 @@ function Home() {
 
   return (
     <div>
-      <p>This is something new</p>
       <pre>{JSON.stringify(user, null, 2)}</pre>
     </div>
   );
