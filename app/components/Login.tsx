@@ -1,8 +1,11 @@
 "use client";
 import { BASE_URL } from "@/lib/baseUrl";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 function Login() {
+  const router = useRouter;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -26,9 +29,10 @@ function Login() {
 
       const data = await response.json();
       localStorage.setItem("tk", data.access_token);
-      localStorage.setItem("refr", data.refresh_token)
+      localStorage.setItem("refr", data.refresh_token);
 
       console.log("Login successful:", data);
+      router.push('/home')
       return data;
     } catch (error: any) {
       console.error("Login error:", error.message);
@@ -70,6 +74,7 @@ function Login() {
       >
         Login
       </button>
+      <Link href={"/home"}>Go home</Link>
     </form>
   );
 }
