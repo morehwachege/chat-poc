@@ -1,15 +1,14 @@
 "use client";
+import { BASE_URL } from "@/lib/baseUrl";
 import React, { useEffect, useState } from "react";
 
 function Login() {
-  const BASE_URL = "http://localhost:3000";
-  const API_VERSION = "api/v1";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      const response = await fetch(`${BASE_URL}/${API_VERSION}/auth/login`, {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
