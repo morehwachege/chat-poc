@@ -1,8 +1,5 @@
-import { createConsumer } from "@rails/actioncable"
-
 const token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMDE5YzM5MTItMjEzZC03ZDZlLWI3NDEtMTIwYWJlM2EyYzRmIiwic2Vzc2lvbl9pZCI6IjAxOWM1OGZjLTZiNGYtNzVmOS1iODJhLTAzNDAyMDliOTBiMyIsImV4cCI6MTc3MTAyMDM2M30.dtt1t-W5oET3pCA3ScWXDiwUGiTU6CkvfUz-HtqjPQQ"
 
-const CABLE_URL = 
-    process.env.NEXT_PUBLIC_CABLE_URL || `ws:localhost:3000/cable?token=${token}`
+export const BASE_URL = 
+    process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:3000/api/v1/`
 
-export const cable = createConsumer(CABLE_URL)
