@@ -7,6 +7,7 @@ function Home() {
   const router = useRouter();
   const [user, setUser] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const currentUser = user || GetUser;
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -22,7 +23,6 @@ function Home() {
   if (checkingAuth) return null;
   return (
     <div>
-      <GetUser />
       <p>This is something new</p>
     </div>
   );

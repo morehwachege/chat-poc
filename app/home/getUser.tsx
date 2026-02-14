@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 
 function GetUser() {
     const accessToken = localStorage.getItem("tk");
+    const [user, setUser] = useState()
     async function handleGetUser(){
         try {
           const response = await fetch(`${BASE_URL}/auth/me`, {
@@ -22,6 +23,7 @@ function GetUser() {
           }
 
           const data = await response.json();
+          setUser(data)
           console.log("User: ", data)
           localStorage.setItem("user", data);
 
@@ -31,8 +33,9 @@ function GetUser() {
           throw error;
         }
     }
-  
-  return <div></div>;
+
+    return user;
+
 }
 
 export default GetUser;
