@@ -59,11 +59,11 @@ export default function ChatBox() {
           <div className="flex justify-start">
             <div
               className="max-w-xs md:max-w-md px-4 py-2 
-          bg-white dark:bg-gray-700 
+          bg-white dark:bg-gray-800 
           text-gray-800 dark:text-gray-100 
           rounded-2xl rounded-bl-none shadow-sm text-sm transition"
             >
-              Incoming message
+              Incoming message that the other user in the pair sent. It should be able to accomodate large paragraphs of text
             </div>
           </div>
 
@@ -75,7 +75,7 @@ export default function ChatBox() {
           text-white 
           rounded-2xl rounded-br-none shadow-sm text-sm transition"
             >
-              Outgoing message
+              Outgoing message representing a message that I am sending to the other party. Should also be able to accomodate large paragraphs of text
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function ChatBox() {
               className="p-2 rounded-full 
           hover:bg-gray-100 dark:hover:bg-gray-700 
           text-gray-700 dark:text-gray-200 
-          transition"
+          transition cursor-pointer"
             >
               📎
             </button>
@@ -121,7 +121,7 @@ export default function ChatBox() {
           rounded-full font-medium 
           hover:bg-gray-800 dark:hover:bg-gray-500 
           active:scale-95 
-          transition-transform"
+          transition-transform cursor-pointer"
             >
               Send
             </button>

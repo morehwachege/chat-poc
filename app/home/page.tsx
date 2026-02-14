@@ -52,7 +52,7 @@ function Home() {
 
   return (
     <div className="w-full">
-      <pre>{JSON.stringify(user, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
       <ChatBox />
     </div>
   );
