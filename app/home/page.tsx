@@ -3,6 +3,7 @@
 import { BASE_URL } from "@/lib/baseUrl";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import ChatBox from "../components/ChatBox";
 
 function Home() {
   const router = useRouter();
@@ -50,8 +51,9 @@ function Home() {
   if (loading) return null;
 
   return (
-    <div>
+    <div className="w-full">
       <pre>{JSON.stringify(user, null, 2)}</pre>
+      <ChatBox />
     </div>
   );
 }
