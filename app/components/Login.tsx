@@ -1,13 +1,23 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { BASE_URL } from "@/lib/baseUrl";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Login() {
-  const router = useRouter;
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    setUser(storedUser);
+  }, []);
+
+  if(user){
+    router.push("/home")
+  }
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
