@@ -1,9 +1,9 @@
 "use client";
 
-import { BASE_URL } from "@/lib/baseUrl";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import ChatBox from "../components/ChatBox";
+import { apiFetch } from "@/lib/utils";
 
 function Home() {
   const router = useRouter();
@@ -11,30 +11,19 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("tk");
-
-    if (!token) {
-      router.replace("/");
-      return;
-    }
-
     async function fetchUser() {
       try {
-        const response = await fetch(`${BASE_URL}/users/me`, {
+        const res = await apiFetch("/users/me", {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
         });
 
-        if (!response.ok) {
+        if (!res || !res.ok) {
           router.replace("/");
           return;
         }
 
-        const data = await response.json();
+        const data = await res.json();
+
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));
       } catch (error) {
@@ -51,8 +40,7 @@ function Home() {
 
   return (
     <div className="w-full">
-      {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
-      <ChatBox user={user}/>
+      <ChatBox user={user} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
-import { createConsumer } from "@rails/actioncable";
-import { useEffect, useState } from "react";
+import { connectCable, reconnectCable } from "@/lib/cable";
+import { useEffect, useRef, useState } from "react";
 
 interface Message {
   id: string;
@@ -11,38 +11,52 @@ interface Message {
   created_at: string;
 }
 
-let subscription: any;
 function ChatBox({ user }: any) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const token = localStorage.getItem("tk");
-    const CABLE_URL = `ws:localhost:3000/cable?token=${token}`;
-    const cable = createConsumer(CABLE_URL);
+  let subscription: any;
+  const subscriptionRef = useRef<any>(null);
 
-    subscription = cable.subscriptions.create(
-      { channel: "ChatChannel" },
-      {
-        received(data: any) {
-          setMessages((prev) => {
-            console.log("Finders", data, user);
-            return [...prev, data];
-          });
-        },
-      },
-    );
+  useEffect(() => {
+    const connection = connectCable((data) => {
+      setMessages((prev) => [...prev, data]);
+    });
+
+    if (!connection) return;
+
+    subscriptionRef.current = connection.subscription;
+
     return () => {
-      subscription.unsubscribe();
+      subscriptionRef.current?.unsubscribe();
     };
   }, []);
 
-  const sendMessage = () => {
-    if (!subscription) return;
-    subscription.send({
-      message: input,
-    });
-    setInput("");
+  const sendMessage = async () => {
+    const subscription = subscriptionRef.current;
+
+    if (!subscription) {
+      console.warn("No subscription");
+      return;
+    }
+
+    try {
+      subscription.send({ message: input });
+      setInput("");
+    } catch (err) {
+      console.warn("Send failed — attempting reconnect");
+
+      const connection = await reconnectCable((data) => {
+        setMessages((prev) => [...prev, data]);
+      });
+
+      if (!connection) return;
+
+      subscriptionRef.current = connection.subscription;
+
+      subscriptionRef.current.send({ message: input });
+      setInput("");
+    }
   };
 
   const handleKeyDown = (event: any) => {
@@ -50,9 +64,6 @@ function ChatBox({ user }: any) {
       sendMessage();
     }
   };
-  //   useEffect(() => {
-  //     console.log(messages, user);
-  //   }, [setMessages]);
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar */}
@@ -107,33 +118,6 @@ function ChatBox({ user }: any) {
           className="flex-1 overflow-y-auto px-6 py-6 space-y-4 
             bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
         >
-          {/* Incoming Message */}
-          <div className="flex justify-start">
-            <div
-              className="max-w-xs md:max-w-md px-4 py-2 
-                bg-white dark:bg-gray-800 
-                text-gray-800 dark:text-gray-100 
-                rounded-2xl rounded-bl-none shadow-sm text-sm transition"
-            >
-              Incoming message that the other user in the pair sent. It should
-              be able to accomodate large paragraphs of text
-            </div>
-          </div>
-
-          {/* Outgoing Message */}
-          <div className="flex justify-end">
-            <div
-              className="max-w-xs md:max-w-md px-4 py-2 
-                bg-black dark:bg-gray-600 
-                text-white 
-                rounded-2xl rounded-br-none shadow-sm text-sm transition"
-            >
-              Outgoing message representing a message that I am sending to the
-              other party. Should also be able to accomodate large paragraphs of
-              text
-            </div>
-          </div>
-
           {messages.map((msg, i) => {
             return msg.sender_id == user.id ? (
               <div key={i} className="flex justify-end">

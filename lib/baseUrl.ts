@@ -1,5 +1,3 @@
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMDE5YzM5MTItMjEzZC03ZDZlLWI3NDEtMTIwYWJlM2EyYzRmIiwic2Vzc2lvbl9pZCI6IjAxOWM1OGZjLTZiNGYtNzVmOS1iODJhLTAzNDAyMDliOTBiMyIsImV4cCI6MTc3MTAyMDM2M30.dtt1t-W5oET3pCA3ScWXDiwUGiTU6CkvfUz-HtqjPQQ"
-
 export const BASE_URL = 
-    process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:3000/api/v1/`
+    process.env.NEXT_PUBLIC_BASE_URL || `http://192.168.100.242:3000/api/v1`
 

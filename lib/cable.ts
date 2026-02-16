@@ -1,8 +1,38 @@
-import { createConsumer } from "@rails/actioncable"
+import { createConsumer } from "@rails/actioncable";
+import { logout, refreshToken } from "./utils";
 
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMDE5YzM5MTItMjEzZC03ZDZlLWI3NDEtMTIwYWJlM2EyYzRmIiwic2Vzc2lvbl9pZCI6IjAxOWM1OGZjLTZiNGYtNzVmOS1iODJhLTAzNDAyMDliOTBiMyIsImV4cCI6MTc3MTAyMDM2M30.dtt1t-W5oET3pCA3ScWXDiwUGiTU6CkvfUz-HtqjPQQ"
+let cable: any = null;
 
-const CABLE_URL = 
-    process.env.NEXT_PUBLIC_CABLE_URL || `ws:localhost:3000/cable?token=${token}`
+export function connectCable(onReceived: (data: any) => void) {
+  const token = localStorage.getItem("tk");
 
-export const cable = createConsumer(CABLE_URL)
+  if (!token) return null;
+
+  cable = createConsumer(`ws://192.168.100.242:3000/cable?token=${token}`);
+
+  const subscription = cable.subscriptions.create(
+    { channel: "ChatChannel" },
+    {
+      received(data: any) {
+        onReceived(data);
+      },
+
+      disconnected() {
+        console.warn("Cable disconnected");
+      },
+    },
+  );
+
+  return { cable, subscription };
+}
+
+export async function reconnectCable(onReceived: (data: any) => void) {
+  const refreshed = await refreshToken();
+
+  if (!refreshed) {
+    logout();
+    return null;
+  }
+
+  return connectCable(onReceived);
+}
